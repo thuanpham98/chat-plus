@@ -1,0 +1,42 @@
+appId: vn.thuanpm.chatApp
+productName: chat app
+directories:
+  output: chat-app-production
+files:
+  - "./dist/app/**/*"
+  # - "./node_modules/**/*"
+  # - "package.json"
+  - "!node_modules/*"
+  - "!package.json"
+  - "!package-lock.json"
+  # - "main.js"
+  # - "index.html"
+mac:
+  category: chatting
+  # icon: build/icon.icns
+  target:
+    - target: dmg
+      arch: x64
+  # extraResources:
+  #   - from: ./extraResources
+  #     to: extraResources
+  #     filter: "**/*"
+extraMetadata:
+  main: dist/app/main.js
+
+extends:
+  null
+  # "build": {
+  #   "asar": true,
+  #   "appId": "vn.thuanpm",
+  #   "mac": {
+  #     "category": "vn.thuanpm.chatapp"
+  #   },
+  #   "files": [
+  #     "dist/**/*",
+  #     "!.github",
+  #     "!.vs",
+  #     "!node_modules/*"
+  #   ]
+  # },
+

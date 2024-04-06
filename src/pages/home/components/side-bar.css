@@ -1,0 +1,14 @@
+.side-bar__item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    aspect-ratio: 1;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 12px;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}

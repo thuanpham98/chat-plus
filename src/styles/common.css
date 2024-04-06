@@ -1,0 +1,30 @@
+:root {
+  --layer-dropdown-menu: 3;
+  --layer-loading: 10;
+  --layer-message: 9;
+  --layer-model: 7;
+  --layer-sidebar: 5;
+
+  --breakpoint-tablet: 600px;
+  --breakpoint-laptop: 1024px;
+}
+
+.column {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.row {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+}
