@@ -18,7 +18,7 @@ module.exports = {
       "@": path.resolve(__dirname, "src/")
     }
   },
-  entry: path.resolve(rootPath, "src/main.tsx"),
+  entry: path.resolve(rootPath, "src/index.tsx"),
   target: "web",
   devtool: "eval-source-map",
   module: {
@@ -34,18 +34,33 @@ module.exports = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: "asset/resource",
-      },
-      {
-        test: /\.svg$/,
-        use: [
-          {
-            loader: "@svgr/webpack",
-            options: {
-              native: true,
-            },
+        generator: {
+          // publicPath: "images",
+          // outputPath: "images",
+          // filename: '[name][ext][query]'
+          filename: (name) => {
+            /**
+             * @description Remove first & last item from ${path} array.
+             * @example
+             *      Orginal Path: 'src/images/avatar/image.jpg'
+             *      Changed To: 'images/avatar'
+             */
+            const path = name.filename.split("/").slice(2, -1).join("/");
+            return `${path}[name][ext]`;
           },
-        ],
+        }
       },
+      // {
+      //   test: /\.svg$/,
+      //   use: [
+      //     {
+      //       loader: "@svgr/webpack",
+      //       options: {
+      //         native: true,
+      //       },
+      //     },
+      //   ],
+      // },
       {
         test: /\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }],

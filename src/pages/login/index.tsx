@@ -3,10 +3,11 @@ import "./style.css";
 import { Input } from "../../components/input/Input";
 import { RdModulesManager, StreamBuilder, useRdBloc } from "@radts/reactjs";
 import { Button } from "../../components/buton/Buttons";
-import { AppStorage } from "../../application/services/app-storage";
-import { AppSession } from "../../application/services/app-session";
-import { LoginStatus } from "../../application/models/LoginStatus";
 import React from "react";
+import { AppRepository } from "@/application/services/app-repository";
+import { AppSession } from "@/application/services/app-session";
+import { LoginStatus } from "@/application/models/LoginStatus";
+import { AppStorage } from "@/application/services/app-storage";
 
 type LoginPageState = {
   username: string;
@@ -15,7 +16,7 @@ type LoginPageState = {
 
 export const LoginPage = () => {
   const formRef = useRef<HTMLFormElement>(null);
-  const [state, _, stream] = useRdBloc<LoginPageState>({
+  const [state, , stream] = useRdBloc<LoginPageState>({
     password: "",
     username: "",
   });
@@ -23,8 +24,15 @@ export const LoginPage = () => {
   async function onLogin() {
     try {
       const manager = new RdModulesManager();
-      manager.get<AppStorage>("AppStorage").accessToken = "accesstoken";
-      manager.get<AppStorage>("AppStorage").refreshToken = "refreshToken";
+      const ret = await manager
+        .get<AppRepository>("AppRepository")
+        .chat.auth.login({
+          username: state.username,
+          password: state.password,
+        });
+
+      manager.get<AppStorage>("AppStorage").accessToken = ret.token;
+      // manager.get<AppStorage>("AppStorage").refreshToken = "refreshToken";
       manager
         .get<AppSession>("AppSession")
         .loginStatus.next(LoginStatus.Success);

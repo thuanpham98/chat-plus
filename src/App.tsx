@@ -9,6 +9,7 @@ import "./styles";
 import React from "react";
 import { AppStorage } from "./application/services/app-storage";
 import { AppSession } from "./application/services/app-session";
+import { chatConfig } from "./application/repository/chat-repository";
 
 function App() {
   const rdManager = new RdModulesManager();
@@ -20,7 +21,7 @@ function App() {
 
   const [isLoading, setLoading] = useState<boolean>(true);
 
-  if (storage.refreshToken.length > 0) {
+  if (storage.accessToken.length > 0) {
     session.loginStatus.next(LoginStatus.Success);
   } else {
     session.loginStatus.next(LoginStatus.Expired);
@@ -37,13 +38,11 @@ function App() {
       setLoading(true);
 
       if (v === LoginStatus.Success) {
-        // lotusConfig.accessToken = storage.accessToken;
-        console.log(location.pathname);
-        if (location.pathname.startsWith(RouterPath.auth.toString())) {
-          await router.navigate(`${RouterPath.home}${window.location.search}`, {
-            replace: true,
-          });
-        } else if (location.pathname.replace("/", "") === "") {
+        chatConfig.accessToken = storage.accessToken;
+        if (
+          location.pathname.startsWith(RouterPath.auth.toString()) ||
+          location.pathname.replace("/", "") === ""
+        ) {
           await router.navigate(`${RouterPath.home}${window.location.search}`, {
             replace: true,
           });
@@ -58,8 +57,9 @@ function App() {
 
         storage.isLogin = true;
       } else if (v === LoginStatus.Expired) {
+        storage.accessToken = "";
         // storage.accessToken && repo.lotus.auth.logout(storage.refreshToken);
-        // lotusConfig.accessToken = undefined;
+        chatConfig.accessToken = undefined;
         storage.clearAll();
         if (
           location.pathname.replaceAll("/", "") ===

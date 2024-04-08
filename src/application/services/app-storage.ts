@@ -10,7 +10,7 @@ enum KeysStorage {
 export class AppStorage extends RdModule {
   private _localStore: RdLocalStorage;
   private _sessionStore: RdSessionStorage;
-  private _packageName: string = "__CHATTING__";
+  private _packageName = "__CHATTING__";
   public readonly key: symbol;
   constructor() {
     super();
@@ -29,18 +29,41 @@ export class AppStorage extends RdModule {
 
   // access token
   public get accessToken(): string {
-    return (
-      this._sessionStore?.getItem({
-        key: `${this._getKey(KeysStorage.accessToken)}`,
-      }) ?? ""
-    );
+    if (process.env.ENVIORNMENT_TYPE.toString() === "web") {
+      return (
+        document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("token="))
+          ?.split("=")[1] ?? ""
+      );
+    } else {
+      const { ipcRenderer } = window.require("electron");
+      const ret = ipcRenderer.sendSync("[coockie][renderer][to][main]", {
+        type: "get",
+        key: "token",
+        value: null,
+      });
+      console.log("return from main.ts", ret);
+      return ret ? ret : "";
+    }
   }
 
   public set accessToken(v: string) {
-    this._sessionStore?.setItem({
-      key: `${this._getKey(KeysStorage.accessToken)}`,
-      value: v,
-    });
+    if (process.env.ENVIORNMENT_TYPE.toString() === "web") {
+      if (v.length === 0) {
+        document.cookie =
+          "token" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      } else {
+        document.cookie = `token=${v}`;
+      }
+    } else if (process.env.ENVIORNMENT_TYPE.toString() === "electron") {
+      const { ipcRenderer } = window.require("electron");
+      ipcRenderer.send("[coockie][renderer][to][main]", {
+        type: "set",
+        key: "token",
+        value: v,
+      });
+    }
   }
 
   // refresh token
@@ -87,7 +110,7 @@ export class AppStorage extends RdModule {
     return parseInt(
       this._sessionStore?.getItem({
         key: `${this._getKey(KeysStorage.countRefreshToken)}`,
-      })
+      }),
     );
   }
 

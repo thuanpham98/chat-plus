@@ -4,6 +4,8 @@ import * as url from "url";
 
 const app = electron.app;
 
+console.log(process.env.ENVIORNMENT_TYPE);
+
 function createWindow() {
   const win = new electron.BrowserWindow({
     width: 800,
@@ -28,6 +30,47 @@ function createWindow() {
     .then(() => {
       console.log("done load window");
     });
+
+  electron.ipcMain.on(
+    "[coockie][renderer][to][main]",
+    async (event, data: any) => {
+      if (data.type === "get") {
+        const cookies = await electron.session.defaultSession.cookies.get({
+          name: data.key,
+          url: process.env.HOST_CHAT,
+        });
+        console.log();
+        if (cookies.length > 0) {
+          event.returnValue = cookies[0].value;
+        } else {
+          event.returnValue = "";
+        }
+        console.log("return cookie token", event.returnValue);
+        return;
+      } else if (data.type === "set") {
+        if ((data.value ?? "") === "") {
+          await electron.session.defaultSession.cookies.remove(
+            process.env.HOST_CHAT,
+            data.key,
+          );
+        } else {
+          const cookie = {
+            url: process.env.HOST_CHAT,
+            name: data.key,
+            value: data?.value ?? "",
+          };
+          electron.session.defaultSession.cookies.set(cookie).then(
+            () => {
+              console.log("save cookie successfully into main.ts");
+            },
+            (error) => {
+              console.error(error);
+            },
+          );
+        }
+      }
+    },
+  );
 }
 
 app?.whenReady().then(() => {

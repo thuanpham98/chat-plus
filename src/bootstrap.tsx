@@ -9,12 +9,15 @@ import { AppRepository } from "./application/services/app-repository";
 import React from "react";
 
 const rdManager = new RdModulesManager<RdModule>();
-rdManager.use(new AppStorage()).use(new AppSession()).use(new AppRepository());
+rdManager
+  .use(new AppStorage())
+  .use(new AppSession())
+  .use(new AppRepository("http://localhost:6969"));
 
 const router = createAppRouter();
 
-console.log("test", document.getElementById("app").id);
-
+console.log("test", process.env.NODE_ENV);
+console.log("test", process.env.ENVIORNMENT_TYPE);
 createRoot(document.getElementById("app")!).render(
   <RouterProvider router={router} fallbackElement={<span>loading</span>} />,
 );
