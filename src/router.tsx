@@ -5,12 +5,17 @@ import { HomeScreen } from "./pages/home";
 import { AuthScreen } from "./pages/auth";
 import { LoginPage } from "./pages/login";
 import React from "react";
+import { RdAppExtends } from "@radts/reactjs";
 
 export function createAppRouter() {
   return createHashRouter([
     {
       path: RouterPath.root,
-      element: <App />,
+      element: (
+        <RdAppExtends appProps={{}}>
+          <App />
+        </RdAppExtends>
+      ),
       children: [
         {
           path: RouterPath.home,
@@ -22,7 +27,24 @@ export function createAppRouter() {
             },
             {
               path: `${RouterPath.chatting}/*`,
-              element: <span>Chat with friend</span>,
+              lazy: async () => {
+                try {
+                  const ChattingPage = (await import("../src/pages/chatting"))
+                    .default;
+                  return {
+                    element: <ChattingPage />,
+                  };
+                } catch (error) {
+                  console.error(error);
+                  return {
+                    element: (
+                      <div style={{ width: "100vw", display: "block" }}>
+                        MAChatWithEveryone is Failed Loading
+                      </div>
+                    ),
+                  };
+                }
+              },
             },
             {
               path: `${RouterPath.chatWithEveryOne}/*`,

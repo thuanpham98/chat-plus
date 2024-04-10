@@ -1,0 +1,12 @@
+.chatting__item-friend {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: #ffffff;
+    width: 100%;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}

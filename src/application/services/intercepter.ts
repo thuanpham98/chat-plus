@@ -12,7 +12,7 @@ export function onResponse(res: AxiosResponse) {
 
 export function onRequest(req: InternalAxiosRequestConfig) {
   if (req.headers !== undefined) {
-    if ((req.url ?? "").startsWith(chatConfig.basePath ?? "")) {
+    if ((req.baseURL ?? "").startsWith(chatConfig.basePath ?? "")) {
       if (chatConfig.accessToken !== undefined) {
         req.headers["Authorization"] = `Bearer ${chatConfig.accessToken}`;
       }

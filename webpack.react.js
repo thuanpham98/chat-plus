@@ -15,8 +15,8 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
     mainFields: ["main", "module", "browser"],
     alias: {
-      "@": path.resolve(__dirname, "src/")
-    }
+      "@": path.resolve(__dirname, "src/"),
+    },
   },
   entry: path.resolve(rootPath, "src/index.tsx"),
   target: "web",
