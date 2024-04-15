@@ -91,6 +91,7 @@ module.exports = {
         main: './src/main.ts', // Entry point cho main.ts
         preload: './src/preload.ts', // Entry point cho preload.ts
         renderer: './src/renderer.ts', // Entry point cho renderer.ts
+        "worker_process_image": "./src/infrastructure/processing-image/processing-image-worker.ts"
     },
 
     output: {

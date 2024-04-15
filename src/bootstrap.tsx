@@ -16,9 +16,8 @@ rdManager
 
 const router = createAppRouter();
 
-console.log("test", process.env.NODE_ENV);
-console.log("test", process.env.ENVIORNMENT_TYPE);
-createRoot(document.getElementById("app")!).render(
+const root = createRoot(document.getElementById("app")!);
+root.render(
   <RouterProvider router={router} fallbackElement={<span>loading</span>} />,
 );
 

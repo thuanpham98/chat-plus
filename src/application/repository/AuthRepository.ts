@@ -20,7 +20,6 @@ export class AuthRepository implements IAuthRepository {
       password: password,
       username: username,
     });
-    console.log(resp);
     if (resp?.data?.code === 0) {
       return { token: resp?.data?.data };
     } else {

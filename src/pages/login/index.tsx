@@ -32,7 +32,6 @@ export const LoginPage = () => {
         });
 
       manager.get<AppStorage>("AppStorage").accessToken = ret.token;
-      // manager.get<AppStorage>("AppStorage").refreshToken = "refreshToken";
       manager
         .get<AppSession>("AppSession")
         .loginStatus.next(LoginStatus.Success);

@@ -6,6 +6,5 @@
  * to expose Node.js functionality from the main process.
  */
 
-console.log("renderror");
 import("./bootstrap");
 

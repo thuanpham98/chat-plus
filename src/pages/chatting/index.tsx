@@ -41,6 +41,7 @@ const ChattingPage = () => {
   if (isLoadingListFriends || isLoadingUserInfo) {
     return <></>;
   }
+
   return (
     <div
       className="row"
@@ -83,18 +84,21 @@ const ChattingPage = () => {
             })}
         </div>
       </div>
-      {dataListFriends &&
+      {state.selectedFriend && (
+        <ChatContainer
+          userId={dataUserInfo.id}
+          friend={state.selectedFriend}
+          isChatting={state.selectedFriend?.id === state.selectedFriend.id}
+          key={state.selectedFriend.id}
+        />
+      )}
+      {/* {dataListFriends &&
         dataUserInfo &&
         dataListFriends.map((d) => {
           return (
-            <ChatContainer
-              userId={dataUserInfo.id}
-              friend={d}
-              isChatting={state.selectedFriend?.id === d.id}
-              key={d.id}
-            />
+           
           );
-        })}
+        })} */}
     </div>
   );
 };

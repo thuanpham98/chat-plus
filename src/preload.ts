@@ -7,9 +7,3 @@
  * https://www.electronjs.org/docs/latest/tutorial/sandbox
  */
 
-console.log("preload");
-
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("your ui done load");
-});
-

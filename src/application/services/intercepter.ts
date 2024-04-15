@@ -1,10 +1,11 @@
 import { AxiosResponse } from "axios";
 import { InternalAxiosRequestConfig } from "axios";
 import { ErrorApi } from "../models/ErrorCustomModel";
-import { chatConfig } from "../repository/chat-repository";
+// import { chatConfig } from "../repository/chat-repository";
 import { AppSession } from "./app-session";
 import { RdModulesManager } from "@radts/reactjs";
 import { LoginStatus } from "../models/LoginStatus";
+import { chatConfig } from "../repository/chat-repository";
 
 export function onResponse(res: AxiosResponse) {
   return Promise.resolve(res);
@@ -14,7 +15,8 @@ export function onRequest(req: InternalAxiosRequestConfig) {
   if (req.headers !== undefined) {
     if ((req.baseURL ?? "").startsWith(chatConfig.basePath ?? "")) {
       if (chatConfig.accessToken !== undefined) {
-        req.headers["Authorization"] = `Bearer ${chatConfig.accessToken}`;
+        // req.headers["Cookie"] = `Authorization=${chatConfig.accessToken}`;
+        // req.headers["Authorization"] = `Bearer ${chatConfig.accessToken}`;
       }
     }
     // orther api host

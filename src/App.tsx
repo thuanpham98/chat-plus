@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { RouterPath } from "./application/services/router-config";
 import { router } from "./bootstrap";
 import { RdModulesManager } from "@radts/reactjs";
-// import { AppRepository } from "./application/services/app-repository";
 import { LoginStatus } from "./application/models/LoginStatus";
 import "./styles";
 import React from "react";
@@ -13,7 +12,6 @@ import { chatConfig } from "./application/repository/chat-repository";
 
 function App() {
   const rdManager = new RdModulesManager();
-  // const repo = rdManager.get<AppRepository>("AppRepository");
   const storage = rdManager.get<AppStorage>("AppStorage");
   const session = rdManager.get<AppSession>("AppSession");
 
@@ -21,7 +19,7 @@ function App() {
 
   const [isLoading, setLoading] = useState<boolean>(true);
 
-  if (storage.accessToken.length > 0) {
+  if (storage.isLogin) {
     session.loginStatus.next(LoginStatus.Success);
   } else {
     session.loginStatus.next(LoginStatus.Expired);
@@ -29,6 +27,7 @@ function App() {
 
   useEffect(() => {
     let currentLoginStatus = LoginStatus.Idle;
+
     rdManager.get<AppSession>("AppSession").loginStatus.subscribe(async (v) => {
       if (currentLoginStatus === v) {
         return;

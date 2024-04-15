@@ -7,11 +7,10 @@ import { RdModulesManager, useRdQuery } from "@radts/reactjs";
 import { AppRepository } from "@/application/services/app-repository";
 import { MessageReponse } from "@/infrastructure/message-protobuf/message";
 import { AppSession } from "@/application/services/app-session";
-import { MessageModelType } from "@/domain/chat";
-// import { MessageReponse } from "@/infrastructure/message-protobuf/message";
+import { ProcessingImageModule } from "@/infrastructure/processing-image/processing-image-module";
 
 export const HomeScreen = () => {
-  const { isLoading, data } = useRdQuery({
+  const { isLoading, data, isSuccess } = useRdQuery({
     queryKey: ["get-user-info-from-home-page"],
     queryFn: async () => {
       const rdManager = new RdModulesManager();
@@ -22,13 +21,15 @@ export const HomeScreen = () => {
     },
   });
   useEffect(() => {
-    // Create WebSocket connection.
-    if (data && data.id) {
+    if (data && data.id && isSuccess) {
+      const rdModule = new RdModulesManager();
+      rdModule.use(new ProcessingImageModule());
+
       const socket = new WebSocket(`ws://localhost:6969/user/ws/message`);
       socket.binaryType = "arraybuffer";
-      // Connection opened
+
       socket.addEventListener("open", () => {
-        socket.send("Hello Server!");
+        // socket.send("Hello Server!");
       });
 
       socket.addEventListener("close", () => {
@@ -39,9 +40,6 @@ export const HomeScreen = () => {
         console.error("socker is error", e);
       });
 
-      const rdModule = new RdModulesManager();
-
-      // Listen for messages
       socket.addEventListener("message", (event) => {
         const data = new Uint8Array(event.data as ArrayBuffer);
         const resp = MessageReponse.fromBinary(data);
@@ -53,9 +51,7 @@ export const HomeScreen = () => {
             Group: resp.group,
             receiver: resp.receiver,
             sender: resp.sender,
-            type: MessageModelType[
-              resp.type.toString() as keyof typeof MessageModelType
-            ],
+            type: resp.type.valueOf(),
           });
         } catch (error) {
           console.error(error);
@@ -64,9 +60,10 @@ export const HomeScreen = () => {
 
       return () => {
         socket.close();
+        rdModule.get<ProcessingImageModule>("ProcessingImageModule").dispose();
       };
     }
-  }, [data]);
+  }, [data, isSuccess]);
 
   if (isLoading) {
     return <></>;

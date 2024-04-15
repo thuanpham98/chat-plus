@@ -33,17 +33,16 @@ export class AppStorage extends RdModule {
       return (
         document.cookie
           .split("; ")
-          .find((row) => row.startsWith("token="))
+          .find((row) => row.startsWith("Authorization="))
           ?.split("=")[1] ?? ""
       );
     } else {
       const { ipcRenderer } = window.require("electron");
       const ret = ipcRenderer.sendSync("[coockie][renderer][to][main]", {
         type: "get",
-        key: "token",
+        key: "Authorization",
         value: null,
       });
-      console.log("return from main.ts", ret);
       return ret ? ret : "";
     }
   }
@@ -52,15 +51,15 @@ export class AppStorage extends RdModule {
     if (process.env.ENVIORNMENT_TYPE.toString() === "web") {
       if (v.length === 0) {
         document.cookie =
-          "token" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          "Authorization" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       } else {
-        document.cookie = `token=${v}`;
+        document.cookie = `Authorization=${v}`;
       }
     } else if (process.env.ENVIORNMENT_TYPE.toString() === "electron") {
       const { ipcRenderer } = window.require("electron");
       ipcRenderer.send("[coockie][renderer][to][main]", {
         type: "set",
-        key: "token",
+        key: "Authorization",
         value: v,
       });
     }

@@ -15,6 +15,7 @@ export class AppRepository extends RdModule {
     axios.interceptors.response.clear();
 
     axios.defaults.timeout = 60 * 1000;
+    axios.defaults.withCredentials = true;
     axios.interceptors.request.use(onRequest, onError);
     axios.interceptors.response.use(onResponse, onError);
     this.chat = new ChatRepository({ ...chatConfig });

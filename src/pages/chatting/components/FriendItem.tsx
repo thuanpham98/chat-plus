@@ -28,7 +28,16 @@ export const FriendItem = ({
         onSelect();
       }}
     >
-      <span>{name}</span>
+      <span
+        style={{
+          color: "#333333",
+          fontSize: "14",
+          lineHeight: "20px",
+          fontWeight: "600",
+        }}
+      >
+        {name}
+      </span>
       <span>{state}</span>
     </div>
   );

@@ -5,10 +5,6 @@ const Dotenv = require('dotenv-webpack');
 
 const rootPath = path.resolve(__dirname, "");
 
-// interface Configuration extends WebpackConfiguration {
-//   devServer?: WebpackDevServerConfiguration;
-// }
-
 module.exports = {
   node: { global: true, },
   resolve: {
@@ -18,7 +14,10 @@ module.exports = {
       "@": path.resolve(__dirname, "src/"),
     },
   },
-  entry: path.resolve(rootPath, "src/index.tsx"),
+  entry: {
+    index: path.resolve(rootPath, "src/index.tsx"),
+    "worker_process_image": path.resolve(rootPath, 'src/infrastructure/processing-image/processing-image-worker.ts')
+  },
   target: "web",
   devtool: "eval-source-map",
   module: {

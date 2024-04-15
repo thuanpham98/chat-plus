@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "WebWorker"],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
