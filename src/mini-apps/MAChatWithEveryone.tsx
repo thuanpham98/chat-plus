@@ -18,7 +18,13 @@ const MAChatWithEveryone: FC<{ initPathName: string }> = ({ initPathName }) => {
 
     return unmountRef.current;
   }, []);
-  return <div id="mini-app-chat-with-everyone" ref={wrapperRef} />;
+  return (
+    <div
+      id="mini-app-chat-with-everyone"
+      ref={wrapperRef}
+      style={{ width: "100%", height: "100%" }}
+    />
+  );
 };
 
 export default MAChatWithEveryone;

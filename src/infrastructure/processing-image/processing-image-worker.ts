@@ -32,7 +32,6 @@ self.addEventListener("message", async function (event) {
     // const dataRet = this.btoa(binary);
     imageBitmap.close();
     this.postMessage({ code: 0, value: blobRet });
-    // close();
   }
 });
 

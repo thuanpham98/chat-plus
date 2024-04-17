@@ -43,12 +43,13 @@ export const HomeScreen = () => {
       socket.addEventListener("message", (event) => {
         const data = new Uint8Array(event.data as ArrayBuffer);
         const resp = MessageReponse.fromBinary(data);
+        console.debug(resp);
         try {
           rdModule.get<AppSession>("AppSession").message.next({
             id: resp.id,
             content: resp.content,
             createAt: resp.createAt,
-            Group: resp.group,
+            group: resp.group,
             receiver: resp.receiver,
             sender: resp.sender,
             type: resp.type.valueOf(),

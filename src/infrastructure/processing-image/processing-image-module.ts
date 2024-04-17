@@ -1,6 +1,6 @@
 import { RdModule } from "@radts/reactjs";
 import { PriorityQueue } from "./priorrity-queue";
-import { BehaviorSubject, Subscription } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 class PriorityQueueData {
@@ -20,7 +20,7 @@ export class ProcessingImageModule extends RdModule {
   private tickets: Map<string, string>;
   private priorityQueue: PriorityQueue<PriorityQueueData>;
   private currentTicket: string;
-  private observer: BehaviorSubject<{
+  private observer: Subject<{
     path: string;
     ticket: string;
     data: string;
@@ -35,15 +35,11 @@ export class ProcessingImageModule extends RdModule {
     this.tickets = new Map<string, string>();
     this.priorityQueue = new PriorityQueue<PriorityQueueData>();
     this.currentTicket = "";
-    this.observer = new BehaviorSubject<{
+    this.observer = new Subject<{
       path: string;
       ticket: string;
       data: string;
-    }>({
-      path: "",
-      ticket: "",
-      data: "",
-    });
+    }>();
     this.worker = new Worker("worker_process_image.js");
     this.worker.onerror = (e) => {
       console.error(e);
@@ -122,7 +118,6 @@ export class ProcessingImageModule extends RdModule {
   }
 
   public startProcess() {
-    console.debug(this.isProcessing);
     if (!this.isProcessing) {
       this.isProcessing = true;
       this.nextProcess();

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useTransition } from "react";
 import "./style.css";
 
 export const FriendItem = ({
   name,
-  message,
   onSelect,
   selected,
 }: {
@@ -12,20 +11,19 @@ export const FriendItem = ({
   onSelect: () => void;
   selected: boolean;
 }) => {
-  const [state, setState] = useState(message);
-
-  useEffect(() => {
-    setState(message);
-  }, [message]);
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div
       className="chatting__item-friend"
       style={{
         backgroundColor: selected ? "rgb(39, 174, 96, 0.4)" : undefined,
+        pointerEvents: isPending ? "none" : undefined,
       }}
       onClick={() => {
-        onSelect();
+        startTransition(() => {
+          onSelect();
+        });
       }}
     >
       <span
@@ -38,7 +36,6 @@ export const FriendItem = ({
       >
         {name}
       </span>
-      <span>{state}</span>
     </div>
   );
 };

@@ -10,7 +10,7 @@ export type MessageModel = {
   id: string;
   sender: string;
   receiver: string;
-  Group?: GroupModel;
+  group?: GroupModel;
   createAt: string;
   content: string;
   type: MessageModelType;

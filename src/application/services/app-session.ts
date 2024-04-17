@@ -1,18 +1,18 @@
 import { RdModule } from "@radts/reactjs";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { LoginStatus } from "../models/LoginStatus";
 import { MessageModel } from "@/domain/chat";
 
 export class AppSession extends RdModule {
   public key: symbol;
   public loginStatus: BehaviorSubject<LoginStatus>;
-  public message: BehaviorSubject<MessageModel | null>;
+  public message: Subject<MessageModel>;
 
   constructor() {
     super();
     this.key = Symbol("AppSession");
     this.loginStatus = new BehaviorSubject<LoginStatus>(LoginStatus.Idle);
-    this.message = new BehaviorSubject<MessageModel>(null);
+    this.message = new Subject<MessageModel>();
   }
   getName(): string {
     return this.key.description ?? "AppSession";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { RdModulesManager, useRdBloc, useRdQuery } from "@radts/reactjs";
 import { AppRepository } from "@/application/services/app-repository";
 import { FriendItem } from "./components/FriendItem";
@@ -43,63 +43,57 @@ const ChattingPage = () => {
   }
 
   return (
-    <div
-      className="row"
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "transparent",
-      }}
-    >
+    <Suspense fallback={<h1>🌀 Loading...</h1>}>
       <div
-        className="column"
+        className="row"
         style={{
-          width: "256px",
+          width: "100%",
           height: "100%",
-          overflowY: "auto",
+          backgroundColor: "transparent",
         }}
       >
         <div
           className="column"
           style={{
-            width: "100%",
-            height: "auth",
+            width: "256px",
+            height: "100%",
+            overflowY: "auto",
           }}
         >
-          {/* list message here */}
-          {dataListFriends &&
-            dataListFriends.map((d, i) => {
-              return (
-                <FriendItem
-                  selected={d.id === state?.selectedFriend?.id}
-                  onSelect={() => {
-                    state.selectedFriend = d;
-                    setState();
-                  }}
-                  key={d.id + i}
-                  name={d.name}
-                  message={""}
-                />
-              );
-            })}
+          <div
+            className="column"
+            style={{
+              width: "100%",
+              height: "auth",
+            }}
+          >
+            {/* list message here */}
+            {dataListFriends &&
+              dataListFriends.map((d, i) => {
+                return (
+                  <FriendItem
+                    selected={d.id === state?.selectedFriend?.id}
+                    onSelect={() => {
+                      state.selectedFriend = d;
+                      setState();
+                    }}
+                    key={d.id + i}
+                    name={d.name}
+                    message={""}
+                  />
+                );
+              })}
+          </div>
         </div>
+        {state.selectedFriend && (
+          <ChatContainer
+            userId={dataUserInfo.id}
+            friend={state.selectedFriend}
+            key={state.selectedFriend.id}
+          />
+        )}
       </div>
-      {state.selectedFriend && (
-        <ChatContainer
-          userId={dataUserInfo.id}
-          friend={state.selectedFriend}
-          isChatting={state.selectedFriend?.id === state.selectedFriend.id}
-          key={state.selectedFriend.id}
-        />
-      )}
-      {/* {dataListFriends &&
-        dataUserInfo &&
-        dataListFriends.map((d) => {
-          return (
-           
-          );
-        })} */}
-    </div>
+    </Suspense>
   );
 };
 

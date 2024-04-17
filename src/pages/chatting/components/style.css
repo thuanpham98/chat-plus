@@ -10,3 +10,17 @@
         background-color: rgba(0, 0, 0, 0.2);
     }
 }
+
+.chatting__input-message {
+    resize: none;
+    max-height: 120px;
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    border: 2px solid transparent;
+    color: #000000;
+    outline: none;
+    border-right: 2px solid pink;
+    border-left: 2px solid pink;
+
+}
