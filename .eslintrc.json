@@ -44,7 +44,7 @@
     "no-console": [
       2,
       {
-        "allow": ["warn", "error", "debug"]
+        "allow": ["warn", "error", "debug", "time", "timeEnd"]
       }
     ],
     "prefer-const": "warn",

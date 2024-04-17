@@ -33,18 +33,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
   const [state, setState] = useRdBloc<ChatContainerState>({
     queueFile: [],
   });
-
-  const refFormMessage = useRef<HTMLFormElement>(null);
+  // const refFormMessage = useRef<HTMLFormElement>(null);
   const refTextMessage = useRef<HTMLTextAreaElement>(null);
-  // const refQueueFile = useRef<
-  //   {
-  //     file: File;
-  //     data: string;
-  //     type: string;
-  //   }[]
-  // >([]);
-
-  console.debug("reload chat containe");
 
   useEffect(() => {
     if (refTextMessage.current) {
@@ -206,7 +196,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       <MessageFrame friendId={friend.id} userId={userId} />
       <form
         id={`form-${friend.id}`}
-        ref={refFormMessage}
+        // ref={refFormMessage}
         onSubmit={(e) => {
           e.preventDefault();
           submitAllMessage();
@@ -272,7 +262,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
 
         <button
           onClick={() => {
-            refFormMessage.current.submit();
+            submitAllMessage();
+            // refFormMessage.current.submit();
           }}
           className="row"
           style={{
