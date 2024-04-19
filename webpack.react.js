@@ -31,35 +31,15 @@ module.exports = {
         },
       },
       {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        test: /\.(png|svg|jpg|jpeg|gif|woff|woff2|eot|ttf|otf)$/i,
         type: "asset/resource",
         generator: {
-          // publicPath: "images",
-          // outputPath: "images",
-          // filename: '[name][ext][query]'
           filename: (name) => {
-            /**
-             * @description Remove first & last item from ${path} array.
-             * @example
-             *      Orginal Path: 'src/images/avatar/image.jpg'
-             *      Changed To: 'images/avatar'
-             */
             const path = name.filename.split("/").slice(2, -1).join("/");
-            return `${path}[name][ext]`;
+            return path ? `${path}/[name][ext]` : `[name][ext]`;
           },
         }
       },
-      // {
-      //   test: /\.svg$/,
-      //   use: [
-      //     {
-      //       loader: "@svgr/webpack",
-      //       options: {
-      //         native: true,
-      //       },
-      //     },
-      //   ],
-      // },
       {
         test: /\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }],

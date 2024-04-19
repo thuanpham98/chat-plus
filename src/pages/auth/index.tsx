@@ -16,6 +16,7 @@ export const AuthScreen = () => {
         alignItems: "center",
         backgroundImage: `url(${test})`,
         backgroundRepeat: "no-repeat",
+        backgroundSize: "contain",
       }}
     >
       <img src={test2} />
