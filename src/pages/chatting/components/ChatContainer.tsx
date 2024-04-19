@@ -140,10 +140,16 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
     const ticket = rdManager
       .get<ProcessingImageModule>("ProcessingImageModule")
       .pushImage(path, WeightQueuePriority.LEVEL6);
+
+    // const retIr = rdManager
+    //   .get<ProcessingImageModule>("ProcessingImageModule")
+    //   .ignoreImage(path);
+
     const sub = rdManager
       .get<ProcessingImageModule>("ProcessingImageModule")
       .subcrise((v: any) => {
         if (v.ticket === ticket) {
+          console.timeEnd();
           URL.revokeObjectURL(path);
           const blob = v.data as Blob;
           const datat = URL.createObjectURL(blob);
@@ -160,6 +166,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         }
       });
 
+    console.time();
     rdManager
       .get<ProcessingImageModule>("ProcessingImageModule")
       .startProcess();

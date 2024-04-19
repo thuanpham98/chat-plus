@@ -18,6 +18,7 @@ export class ProcessingImageModule extends RdModule {
   }
 
   private tickets: Map<string, string>;
+  private ticketsIgnore: Map<string, string>;
   private priorityQueue: PriorityQueue<PriorityQueueData>;
   private currentTicket: string;
   private observer: Subject<{
@@ -33,6 +34,7 @@ export class ProcessingImageModule extends RdModule {
     this.key = Symbol("ProcessingImageModule");
     this.isProcessing = false;
     this.tickets = new Map<string, string>();
+    this.ticketsIgnore = new Map<string, string>();
     this.priorityQueue = new PriorityQueue<PriorityQueueData>();
     this.currentTicket = "";
     this.observer = new Subject<{
@@ -87,10 +89,15 @@ export class ProcessingImageModule extends RdModule {
       this.currentTicket.trim() === "" &&
       this.isProcessing
     ) {
+      console.debug(this);
       const ret = this.priorityQueue.dequeue();
+      if (this.ticketsIgnore.has(ret.path)) {
+        this.tickets.delete(ret.path);
+        this.ticketsIgnore.delete(ret.path);
+        this.nextProcess();
+      }
       this.currentTicket = this.tickets.get(ret.path);
       this.tickets.delete(ret.path);
-
       this.worker.postMessage({ type: "processing", value: ret.path });
     }
   }
@@ -101,6 +108,14 @@ export class ProcessingImageModule extends RdModule {
       this.tickets.set(path, uuidv4());
     }
     return this.tickets.get(path);
+  }
+
+  public ignoreImage(path: string): boolean {
+    if (!this.tickets.has(path)) {
+      return false;
+    }
+    this.ticketsIgnore.set(path, this.tickets.get(path));
+    return true;
   }
 
   public subcrise(
