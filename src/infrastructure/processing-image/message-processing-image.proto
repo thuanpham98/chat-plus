@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+enum MessageProcessingImageEventType {
+  INIT=0;
+  START = 1;
+  END = 2;
+  ERROR = 3;
+}
+
+message MessageProcessingImageResponse {
+    MessageProcessingImageEventType eventType=1;
+    bytes data = 2;
+    string typeImage =3;
+}
+
+message MessageProcessingImageRequest {
+    MessageProcessingImageEventType eventType=1;
+    string path = 2;
+}

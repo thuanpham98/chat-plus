@@ -33,7 +33,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
   const [state, setState] = useRdBloc<ChatContainerState>({
     queueFile: [],
   });
-  // const refFormMessage = useRef<HTMLFormElement>(null);
+  const refFormMessage = useRef<HTMLFormElement>(null);
   const refTextMessage = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -115,7 +115,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         // state.queueFile.map((e) => sendMessageFile(e.file).finally(()=>{
         //   URL.revokeObjectURL(e.data);
         // }));
-        Promise.all(
+        console.debug(state.queueFile);
+        await Promise.all(
           state.queueFile.map((e) =>
             sendMessageFile(e.file).finally(() => {
               URL.revokeObjectURL(e.data);
@@ -141,24 +142,18 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       .get<ProcessingImageModule>("ProcessingImageModule")
       .pushImage(path, WeightQueuePriority.LEVEL6);
 
-    // const retIr = rdManager
-    //   .get<ProcessingImageModule>("ProcessingImageModule")
-    //   .ignoreImage(path);
-
     const sub = rdManager
       .get<ProcessingImageModule>("ProcessingImageModule")
-      .subcrise((v: any) => {
-        if (v.ticket === ticket) {
-          console.timeEnd();
+      .subcrise((v) => {
+        if (v.ticket === ticket && v.data) {
           URL.revokeObjectURL(path);
-          const blob = v.data as Blob;
-          const datat = URL.createObjectURL(blob);
+          const datat = URL.createObjectURL(v.data);
           const ele = state.queueFile.findIndex((e) => e.id === id);
           if (ele > -1) {
             const oldFile = state.queueFile[ele].file;
             state.queueFile[ele].data = datat;
-            state.queueFile[ele].file = new File([blob], oldFile.name, {
-              type: blob.type,
+            state.queueFile[ele].file = new File([v.data], oldFile.name, {
+              type: v.data.type,
             });
             setState();
           }
@@ -166,7 +161,6 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         }
       });
 
-    console.time();
     rdManager
       .get<ProcessingImageModule>("ProcessingImageModule")
       .startProcess();
@@ -203,9 +197,10 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       <MessageFrame friendId={friend.id} userId={userId} />
       <form
         id={`form-${friend.id}`}
-        // ref={refFormMessage}
+        ref={refFormMessage}
         onSubmit={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           submitAllMessage();
         }}
         className="row"
@@ -268,9 +263,10 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         />
 
         <button
+          form={`form-${friend.id}`}
           onClick={() => {
-            submitAllMessage();
-            // refFormMessage.current.submit();
+            // submitAllMessage();
+            refFormMessage.current.submit();
           }}
           className="row"
           style={{

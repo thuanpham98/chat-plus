@@ -18,7 +18,8 @@
     "clean": "rm -rf chat-app-production",
     "dist": "npm run clean && cross-env NODE_ENV=production electron-builder",
     "dir": "cross-env NODE_ENV=production electron-builder --dir",
-    "generate:message-protoc": "protoc --ts_out src/infrastructure/message-protobuf --proto_path src/infrastructure/message-protobuf src/infrastructure/message-protobuf/message.proto"
+    "generate:message-protoc": "protoc --ts_out src/infrastructure/message-protobuf --proto_path src/infrastructure/message-protobuf src/infrastructure/message-protobuf/message.proto",
+    "generate:message-processing-image-protoc": "protoc --ts_out src/infrastructure/processing-image --proto_path src/infrastructure/processing-image src/infrastructure/processing-image/message-processing-image.proto"
   },
   "dependencies": {
     "@protobuf-ts/protoc": "^2.9.4",
@@ -73,3 +74,4 @@
     "webpack-dev-server": "^4.15.2"
   }
 }
+
