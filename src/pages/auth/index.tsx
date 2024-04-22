@@ -2,7 +2,6 @@ import "react";
 import { Outlet } from "react-router-dom";
 import React from "react";
 import test from "../../assets/images/img-auth-background.svg";
-import test2 from "../../assets/react.svg";
 
 export const AuthScreen = () => {
   return (
@@ -19,9 +18,7 @@ export const AuthScreen = () => {
         backgroundSize: "contain",
       }}
     >
-      <img src={test2} />
       <Outlet />
     </div>
   );
 };
-

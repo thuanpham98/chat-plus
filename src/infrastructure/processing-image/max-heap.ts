@@ -144,4 +144,3 @@ export class MaxHeap<T> {
     return this.heap.length === 0;
   }
 }
-

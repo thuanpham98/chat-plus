@@ -10,4 +10,3 @@ export const Button: FC<
 > = (props) => {
   return <button {...props} className={props.className ?? "button"} />;
 };
-

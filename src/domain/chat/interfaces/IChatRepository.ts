@@ -14,4 +14,3 @@ export interface IMessageRepository {
 
   deleteMessage({ id }: { id: string }): Promise<boolean>;
 }
-

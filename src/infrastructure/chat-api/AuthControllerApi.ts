@@ -24,4 +24,3 @@ export class AuthControllerApi {
     return ret.data;
   }
 }
-

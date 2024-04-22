@@ -11,9 +11,9 @@
   "postinstall": "electron-builder install-app-deps",
   "scripts": {
     "dev:react": "cross-env NODE_ENV=development webpack serve --config webpack.react.js --mode=development",
-    "build:react": "cross-env NODE_ENV=production webpack --config webpack.react.js --mode=production",
-    "dev:electron": "rm -rf /dist/app && cross-env NODE_ENV=development webpack --config webpack.electron.js --mode=development && npm run start:electron",
-    "build:electron": "rm -rf /dist/app && cross-env webpack --config webpack.electron.js --mode=production",
+    "build:react": "prettier --write src/ && eslint src/ && cross-env NODE_ENV=production webpack --config webpack.react.js --mode=production && cp .env dist/web",
+    "dev:electron": "rm -rf /dist/app && cross-env NODE_ENV=development webpack --config webpack.electron.js --mode=development && cp .env dist/app && npm run start:electron",
+    "build:electron": "prettier --write src/ && eslint src/ && rm -rf /dist/app && cross-env NODE_ENV=production webpack --config webpack.electron.js --mode=production && cp .env dist/app",
     "start:electron": "electron dist/app/main.js",
     "clean": "rm -rf chat-app-production",
     "dist": "npm run clean && cross-env NODE_ENV=production electron-builder",

@@ -7,12 +7,13 @@ import { AppStorage } from "./application/services/app-storage";
 import { AppSession } from "./application/services/app-session";
 import { AppRepository } from "./application/services/app-repository";
 import React from "react";
+import { Environment } from "./application/services/environment";
 
 const rdManager = new RdModulesManager<RdModule>();
 rdManager
   .use(new AppStorage())
   .use(new AppSession())
-  .use(new AppRepository("http://localhost:6969"));
+  .use(new AppRepository(Environment.hostApi));
 
 const router = createAppRouter();
 
@@ -22,4 +23,3 @@ root.render(
 );
 
 export { router };
-

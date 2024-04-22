@@ -1,3 +1,4 @@
+import { Environment } from "@/application/services/environment";
 import { MessageModel, MessageModelType } from "@/domain/chat";
 import React from "react";
 
@@ -51,7 +52,7 @@ export const MessageItem = ({
         <a
           rel="noreferrer"
           target="_blank"
-          href={`http://localhost:6969/api/v1/storage/public/image/${message.content}`}
+          href={`${Environment.urlPublicImage}/${message.content}`}
           className="column"
           style={{
             width: "fit-content",
@@ -71,7 +72,7 @@ export const MessageItem = ({
       )}
       {message.type.valueOf() === MessageModelType.IMAGE.valueOf() && (
         <img
-          src={`http://localhost:6969/api/v1/storage/public/image/${message.content}`}
+          src={`${Environment.urlPublicImage}/${message.content}`}
           style={{ width: "320px" }}
         />
       )}
@@ -97,4 +98,3 @@ export const MessageItem = ({
     </div>
   );
 };
-

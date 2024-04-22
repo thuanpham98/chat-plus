@@ -55,4 +55,3 @@ export function checkTypeImageFromArrayBuffer(data: ArrayBuffer): string {
       return "";
   }
 }
-

@@ -9,4 +9,3 @@ export interface IAuthRepository {
     password: string;
   }): Promise<AccessTokenModel>;
 }
-

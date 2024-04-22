@@ -1,4 +1,5 @@
 import { RdLocalStorage, RdModule, RdSessionStorage } from "@radts/reactjs";
+import { Environment } from "./environment";
 
 enum KeysStorage {
   accessToken = "accessToken",
@@ -29,7 +30,7 @@ export class AppStorage extends RdModule {
 
   // access token
   public get accessToken(): string {
-    if (process.env.ENVIORNMENT_TYPE.toString() === "web") {
+    if (Environment.envType.toString() === "web") {
       return (
         document.cookie
           .split("; ")
@@ -48,14 +49,14 @@ export class AppStorage extends RdModule {
   }
 
   public set accessToken(v: string) {
-    if (process.env.ENVIORNMENT_TYPE.toString() === "web") {
+    if (Environment.envType.toString() === "web") {
       if (v.length === 0) {
         document.cookie =
           "Authorization" + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       } else {
         document.cookie = `Authorization=${v}`;
       }
-    } else if (process.env.ENVIORNMENT_TYPE.toString() === "electron") {
+    } else if (Environment.envType.toString() === "electron") {
       const { ipcRenderer } = window.require("electron");
       ipcRenderer.send("[coockie][renderer][to][main]", {
         type: "set",

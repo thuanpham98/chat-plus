@@ -8,6 +8,7 @@ import { AppRepository } from "@/application/services/app-repository";
 import { MessageReponse } from "@/infrastructure/message-protobuf/message";
 import { AppSession } from "@/application/services/app-session";
 import { ProcessingImageModule } from "@/infrastructure/processing-image/processing-image-module";
+import { Environment } from "@/application/services/environment";
 
 export const HomeScreen = () => {
   const { isLoading, data, isSuccess } = useRdQuery({
@@ -25,7 +26,7 @@ export const HomeScreen = () => {
       const rdModule = new RdModulesManager();
       rdModule.use(new ProcessingImageModule());
 
-      const socket = new WebSocket(`ws://localhost:6969/user/ws/message`);
+      const socket = new WebSocket(`${Environment.hostWsMessage}`);
       socket.binaryType = "arraybuffer";
 
       socket.addEventListener("open", () => {
@@ -43,7 +44,6 @@ export const HomeScreen = () => {
       socket.addEventListener("message", (event) => {
         const data = new Uint8Array(event.data as ArrayBuffer);
         const resp = MessageReponse.fromBinary(data);
-        console.debug(resp);
         try {
           rdModule.get<AppSession>("AppSession").message.next({
             id: resp.id,
@@ -78,4 +78,3 @@ export const HomeScreen = () => {
     </section>
   );
 };
-

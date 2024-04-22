@@ -13,7 +13,6 @@ self.addEventListener("message", async function (event) {
     if (!data || data.byteLength === 0) {
       return;
     }
-    console.debug("testing", isStart);
     try {
       const message = MessageProcessingImageRequest.fromBinary(data, {
         readUnknownField: false,
@@ -107,7 +106,6 @@ async function handlerMessageFromPort(event: MessageEvent) {
         typeImage: blobImg.type,
       });
       portMessage.postMessage(resp, [resp.buffer]);
-      console.debug("done", resp);
     } catch (error) {
       console.error(error);
       const resp = MessageProcessingImageResponse.toBinary({
@@ -121,4 +119,3 @@ async function handlerMessageFromPort(event: MessageEvent) {
     }
   }
 }
-

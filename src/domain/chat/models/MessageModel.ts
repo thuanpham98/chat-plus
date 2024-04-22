@@ -15,4 +15,3 @@ export type MessageModel = {
   content: string;
   type: MessageModelType;
 };
-

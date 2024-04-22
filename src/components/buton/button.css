@@ -1,23 +1,23 @@
 .button {
-    background-color: #E3F3FB;
-    padding: 7px 11px;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
+  background-color: #e3f3fb;
+  padding: 7px 11px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  border: 1px solid transparent;
+  outline: none;
+
+  &:hover:not(:disabled) {
     border: 1px solid transparent;
-    outline: none;
+    border-color: #4067ec;
+  }
 
-    &:hover:not(:disabled) {
-        border: 1px solid transparent;
-        border-color: #4067EC;
-    }
+  &:not(:disabled):active {
+    border: 1px solid transparent;
+    border-color: #4067ec;
+  }
 
-    &:not(:disabled):active {
-        border: 1px solid transparent;
-        border-color: #4067EC;
-    }
-
-    &:disabled {
-        border: 1px solid transparent;
-    }
+  &:disabled {
+    border: 1px solid transparent;
+  }
 }

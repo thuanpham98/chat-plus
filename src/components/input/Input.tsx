@@ -10,4 +10,3 @@ export const Input: FC<
 > = (props) => {
   return <input {...props} className={props.className ?? "input"} />;
 };
-

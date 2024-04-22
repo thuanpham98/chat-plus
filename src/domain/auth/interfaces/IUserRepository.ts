@@ -4,4 +4,3 @@ export interface IUserRepository {
   userInfo(): Promise<UserModel>;
   listFriends(): Promise<UserModel[]>;
 }
-

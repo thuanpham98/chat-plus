@@ -186,4 +186,3 @@ export class ProcessingImageModule extends RdModule {
     this.isProcessing = false;
   }
 }
-

@@ -98,4 +98,3 @@ const ChattingPage = () => {
 };
 
 export default ChattingPage;
-

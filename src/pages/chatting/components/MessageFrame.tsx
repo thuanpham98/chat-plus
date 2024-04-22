@@ -80,7 +80,6 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
             });
           }
         });
-      console.debug("reset", friendId);
 
       return () => {
         subcriptionMessage.unsubscribe();
@@ -115,11 +114,6 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
           }
         }
         refFrame.current.onscroll = () => {
-          // console.debug(
-          //   "check",
-          //   refFrame.current.scrollHeight - refFrame.current.clientHeight,
-          //   -refFrame.current.scrollTop + 1,
-          // );
           if (
             refFrame.current.scrollHeight - refFrame.current.clientHeight <=
             -refFrame.current.scrollTop + 1
@@ -208,4 +202,3 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
 );
 
 export default MessageFrame;
-

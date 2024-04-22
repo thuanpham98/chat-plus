@@ -40,4 +40,3 @@ export class PriorityQueue<T> {
     return this.maxHeap.size();
   }
 }
-

@@ -15,7 +15,7 @@ function createWindow() {
     },
   });
 
-  win.webContents.openDevTools();
+  process.env.NODE_ENV === "development" && win.webContents.openDevTools();
   win
     .loadURL(
       url.format({
@@ -37,7 +37,8 @@ function createWindow() {
             details.requestHeaders[
               "Cookie"
             ] = `Authorization=${cookies[0].value}`;
-            details.requestHeaders["Origin"] = "http://chat-app.com.vn";
+            details.requestHeaders["Origin"] =
+              process.env.CHAT_PLUS_HOST_ELECTRON;
           }
           callback({ cancel: false, requestHeaders: details.requestHeaders });
         },
@@ -86,21 +87,6 @@ function createWindow() {
       }
     },
   );
-
-  // electron.session.defaultSession.webRequest.onBeforeSendHeaders(
-  //   { urls: ["http://localhost:6969"] },
-  //   async (details, callback) => {
-  //     const cookies = await electron.session.defaultSession.cookies.get({
-  //       name: "Authorization",
-  //       url: process.env.HOST_CHAT_API,
-  //     });
-  //     if (cookies.length > 0) {
-  //       details.requestHeaders["Cookie"] = `Authorization=${cookies[0]}`;
-  //     }
-
-  //     callback({ requestHeaders: details.requestHeaders });
-  //   },
-  // );
 }
 
 app?.whenReady().then(() => {
@@ -118,4 +104,3 @@ app?.on("window-all-closed", () => {
     app.quit();
   }
 });
-

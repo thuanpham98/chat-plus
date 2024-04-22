@@ -18,4 +18,3 @@ export const IcChattingX20 = ({ color = "#FFFFFF" }: { color?: string }) => {
     </svg>
   );
 };
-

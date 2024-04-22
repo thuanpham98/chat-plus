@@ -28,4 +28,3 @@ const MAChatWithEveryone: FC<{ initPathName: string }> = ({ initPathName }) => {
 };
 
 export default MAChatWithEveryone;
-

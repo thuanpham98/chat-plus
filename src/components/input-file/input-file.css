@@ -1,20 +1,20 @@
 .input-file-custom {
-    border: none;
-    outline: none;
-    content: "Tải";
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    visibility: hidden;
-    position: absolute;
-    top: 0px;
-    left: 0px;
+  border: none;
+  outline: none;
+  content: "Tải";
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  visibility: hidden;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 .input-file-custom::-webkit-file-upload-button {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .input-file-custom::file-selector-button {
-    visibility: hidden;
+  visibility: hidden;
 }

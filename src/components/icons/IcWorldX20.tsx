@@ -16,4 +16,3 @@ export const IcWorldX20 = ({ color = "#FFFFFF" }: { color?: string }) => {
     </svg>
   );
 };
-

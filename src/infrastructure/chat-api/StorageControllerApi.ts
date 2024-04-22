@@ -38,4 +38,3 @@ export class StorageControllerApi {
     return ret.data;
   }
 }
-

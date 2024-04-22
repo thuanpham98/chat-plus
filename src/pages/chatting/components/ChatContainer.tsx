@@ -115,7 +115,6 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         // state.queueFile.map((e) => sendMessageFile(e.file).finally(()=>{
         //   URL.revokeObjectURL(e.data);
         // }));
-        console.debug(state.queueFile);
         await Promise.all(
           state.queueFile.map((e) =>
             sendMessageFile(e.file).finally(() => {
@@ -216,7 +215,6 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       >
         <InputFile
           onChange={(dataUrl, f, typeImage) => {
-            console.debug(f);
             const element = {
               data: dataUrl,
               file: f,
@@ -369,4 +367,3 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
     </div>
   );
 };
-
