@@ -1,6 +1,6 @@
 import { UserModel } from "@/domain/auth";
 import { RdModulesManager, useRdBloc } from "@radts/reactjs";
-import React, { FC, useEffect, useRef } from "react";
+import React, { FC, useCallback, useEffect, useRef } from "react";
 import { InputFile } from "@/components/input-file/InputFile";
 import {
   MessageRequest,
@@ -33,6 +33,7 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
   const [state, setState] = useRdBloc<ChatContainerState>({
     queueFile: [],
   });
+  const refIsSending = useRef(false);
   const refFormMessage = useRef<HTMLFormElement>(null);
   const refTextMessage = useRef<HTMLTextAreaElement>(null);
 
@@ -45,7 +46,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
 
           if (refTextMessage.current.value.trim().length > 0 && !check) {
             check = true;
-            submitAllMessage();
+            // submitAllMessage();
+            refFormMessage.current.requestSubmit();
             setTimeout(() => {
               check = false;
             }, 500);
@@ -66,9 +68,11 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         }),
       );
 
-      rdManage.get<AppRepository>("AppRepository").chat.message.sendToFriend({
-        data: message,
-      });
+      await rdManage
+        .get<AppRepository>("AppRepository")
+        .chat.message.sendToFriend({
+          data: message,
+        });
     } catch (error) {
       console.error(error);
     }
@@ -104,7 +108,11 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
     }
   }
 
-  async function submitAllMessage() {
+  const submitAllMessage = useCallback(async () => {
+    if (refIsSending.current) {
+      return;
+    }
+    refIsSending.current = true;
     const _message = refTextMessage.current.value.trim();
     refTextMessage.current.value = "";
     try {
@@ -115,24 +123,53 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         // state.queueFile.map((e) => sendMessageFile(e.file).finally(()=>{
         //   URL.revokeObjectURL(e.data);
         // }));
+        console.debug(state.queueFile);
+        // old
         await Promise.all(
           state.queueFile.map((e) =>
             sendMessageFile(e.file).finally(() => {
               URL.revokeObjectURL(e.data);
             }),
           ),
-        ).finally(() => {
-          state.queueFile = [];
-          setState();
-        });
+        );
+        // .finally(() => {
+        //   state.queueFile = [];
+        //   setState();
+        // });
+
+        // new
+        // Promise.all(
+        //   state.queueFile.map((e) =>
+        //     sendMessageFile(e.file).finally(() => {
+        //       URL.revokeObjectURL(e.data);
+        //     }),
+        //   ),
+        // )
+        //   .then(() => {
+        //     state.queueFile = [];
+        //     setState();
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //     // Xử lý lỗi nếu cần
+        //   });
+
         // state.queueFile.map((e) => {
         //   URL.revokeObjectURL(e.data);
         // });
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      state.queueFile = [];
+      setState();
+      refIsSending.current = false;
     }
-  }
+  }, [state.queueFile.length, refTextMessage.current]);
+
+  // async function submitAllMessage() {
+
+  // }
 
   function resizeImage(path: string, id: string) {
     const rdManager = new RdModulesManager();
@@ -155,6 +192,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
               type: v.data.type,
             });
             setState();
+          } else {
+            URL.revokeObjectURL(datat);
           }
           sub.unsubscribe();
         }
@@ -164,6 +203,8 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       .get<ProcessingImageModule>("ProcessingImageModule")
       .startProcess();
   }
+
+  console.debug("in main", state.queueFile);
 
   return (
     <div
@@ -255,16 +296,18 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
           className="chatting__input-message"
           role="textbox"
           rows={5}
-          form={`form-${friend.id}`}
+          // form={`form-${friend.id}`}
           ref={refTextMessage}
           placeholder="Gửi tin nhắn đi"
         />
 
         <button
-          form={`form-${friend.id}`}
-          onClick={() => {
+          // form={`form-${friend.id}`}
+          onClick={(e) => {
+            // e.preventDefault();
+            e.stopPropagation();
             // submitAllMessage();
-            refFormMessage.current.submit();
+            refFormMessage.current.requestSubmit();
           }}
           className="row"
           style={{

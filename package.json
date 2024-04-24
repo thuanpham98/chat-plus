@@ -19,7 +19,8 @@
     "dist": "npm run clean && cross-env NODE_ENV=production electron-builder",
     "dir": "cross-env NODE_ENV=production electron-builder --dir",
     "generate:message-protoc": "protoc --ts_out src/infrastructure/message-protobuf --proto_path src/infrastructure/message-protobuf src/infrastructure/message-protobuf/message.proto",
-    "generate:message-processing-image-protoc": "protoc --ts_out src/infrastructure/processing-image --proto_path src/infrastructure/processing-image src/infrastructure/processing-image/message-processing-image.proto"
+    "generate:message-processing-image-protoc": "protoc --ts_out src/infrastructure/processing-image --proto_path src/infrastructure/processing-image src/infrastructure/processing-image/message-processing-image.proto",
+    "generate:message-interaction-indexdb-protoc": "protoc --ts_out src/infrastructure/index-db-interaction --proto_path src/infrastructure/index-db-interaction src/infrastructure/index-db-interaction/message-index-db-interaction.proto"
   },
   "dependencies": {
     "@protobuf-ts/protoc": "^2.9.4",

@@ -57,7 +57,7 @@ export const MessageItem = ({
           style={{
             width: "fit-content",
             minWidth: "36px",
-            maxWidth: "calc(100% - 84px)",
+            maxWidth: "calc(60%)",
             textAlign: "start",
             backgroundColor: isSender ? "#FFC0CB" : "#303030",
             color: isSender ? "#212121" : "#FFFFFF",
@@ -73,7 +73,7 @@ export const MessageItem = ({
       {message.type.valueOf() === MessageModelType.IMAGE.valueOf() && (
         <img
           src={`${Environment.urlPublicImage}/${message.content}`}
-          style={{ width: "320px" }}
+          style={{ width: "auto", maxWidth: "60%" }}
         />
       )}
       {message.type.valueOf() === MessageModelType.TEXT.valueOf() && (
@@ -82,7 +82,7 @@ export const MessageItem = ({
           style={{
             width: "fit-content",
             minWidth: "36px",
-            maxWidth: "calc(100% - 84px)",
+            maxWidth: "calc(60%)",
             textAlign: "start",
             backgroundColor: isSender ? "#FFC0CB" : "#303030",
             color: isSender ? "#212121" : "#FFFFFF",
@@ -90,6 +90,7 @@ export const MessageItem = ({
             borderRadius: "12px",
             whiteSpace: "initial",
             wordBreak: "break-word",
+            overflowWrap: "break-word",
           }}
         >
           {message.content}

@@ -1,5 +1,5 @@
 appId: vn.thuanpm.chatApp
-productName: chat app
+productName: chat plus
 directories:
   output: chat-app-production
 files:
@@ -16,6 +16,15 @@ mac:
   # icon: build/icon.icns
   target:
     - target: dmg
+      arch: arm64
+    - target: dmg
+      arch: x64
+
+win:
+  target:
+    - target: nsis
+      arch: ia32
+    - target: nsis
       arch: x64
   # extraResources:
   #   - from: ./extraResources

@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState, useTransition } from "react";
 import { List } from "immutable";
 import { MessageItem } from "./MessageItem";
 import { AppRepository } from "@/application/services/app-repository";
+import { Environment } from "@/application/services/environment";
+import { IndexDbInteraction } from "@/infrastructure/index-db-interaction/index-db-module";
 
 interface MessageFrameProps {
   userId: string;
@@ -29,43 +31,66 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
     const refListMessage = useRef<HTMLDivElement>(null);
 
     const curMessage = useRef<List<MessageModel>>(List<MessageModel>([]));
-    const isDoneLoading = useRef<boolean>(false);
+    const isLoadedAllData = useRef<boolean>(false);
 
     const [state, setState] = useState<List<MessageModel>>(curMessage.current);
 
     const { isLoading, refetch, isRefetching, isSuccess } = useRdQuery({
       queryKey: ["get-list-message-in-message-frame", friendId],
       queryFn: async () => {
-        if (isDoneLoading.current) {
+        if (isLoadedAllData.current) {
           return [];
         }
-        const ret = await rdManager
-          .get<AppRepository>("AppRepository")
-          .chat.message.listMessage({
-            page: paging.current.page,
-            pageSize: paging.current.pageSize,
-            receiver: friendId,
-          });
-        if (ret.length === 0) {
-          isDoneLoading.current = true;
+        if (Environment.envType === "web") {
+          rdManager
+            .get<IndexDbInteraction>("IndexDbInteraction")
+            .listMessage(
+              userId,
+              friendId,
+              BigInt(paging.current.page),
+              BigInt(paging.current.pageSize),
+            );
+          const ret = await rdManager
+            .get<IndexDbInteraction>("IndexDbInteraction")
+            .listenMessages();
+          curMessage.current = List<MessageModel>(ret ?? [])
+            .concat(List<MessageModel>(curMessage.current))
+            .filter(
+              (item, index, self) =>
+                index === self.findIndex((t) => t.id === item.id),
+            );
+          if (ret.length < paging.current.pageSize) {
+            isLoadedAllData.current = true;
+          }
+          setState(curMessage.current);
+          return curMessage.current ?? [];
+        } else {
+          const ret = await rdManager
+            .get<AppRepository>("AppRepository")
+            .chat.message.listMessage({
+              page: paging.current.page,
+              pageSize: paging.current.pageSize,
+              receiver: friendId,
+            });
+
+          curMessage.current = List<MessageModel>(ret ?? [])
+            .concat(List<MessageModel>(curMessage.current))
+            .filter(
+              (item, index, self) =>
+                index === self.findIndex((t) => t.id === item.id),
+            );
+          // console.debug("get-----", paging.current.page);
+          if (ret.length < paging.current.pageSize) {
+            isLoadedAllData.current = true;
+          }
+          setState(curMessage.current);
+          // console.debug("return-----", paging.current.page);
+          return curMessage.current ?? [];
         }
-
-        curMessage.current = List<MessageModel>(ret ?? [])
-          .concat(List<MessageModel>(curMessage.current))
-          .filter(
-            (item, index, self) =>
-              index === self.findIndex((t) => t.id === item.id),
-          );
-
-        setState(curMessage.current);
-        return curMessage.current ?? [];
       },
     });
 
     useEffect(() => {
-      // stream listen message from websocket
-      const rdManager = new RdModulesManager();
-
       const subcriptionMessage = rdManager
         .get<AppSession>("AppSession")
         .message.subscribe((mes) => {
@@ -89,50 +114,53 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
     useEffect(() => {
       if (
         !isLoading &&
+        !isRefetching &&
         isSuccess &&
         refFrame.current &&
         refListMessage.current
       ) {
         if (
-          !isDoneLoading.current &&
+          !isLoadedAllData.current &&
           refFrame.current.clientHeight > refListMessage.current.clientHeight
         ) {
-          for (
-            let index = 0;
-            index <
-            Math.round(
-              refFrame.current.clientHeight /
-                refListMessage.current.clientHeight,
-            );
-            index++
-          ) {
-            if (isDoneLoading.current) {
-              break;
-            }
-            paging.current.page++;
-            refetch();
-          }
+          paging.current.page++;
+          refetch();
         }
+      }
+    }, [
+      refFrame.current,
+      refetch,
+      refListMessage.current,
+      isLoading,
+      isRefetching,
+    ]);
+
+    useEffect(() => {
+      if (refFrame.current) {
         refFrame.current.onscroll = () => {
           if (
             refFrame.current.scrollHeight - refFrame.current.clientHeight <=
             -refFrame.current.scrollTop + 1
           ) {
-            if (!isDoneLoading.current) {
+            if (!isLoadedAllData.current) {
               paging.current.page++;
               refetch();
             }
-            // load all data message here
           }
         };
       }
-    }, [refFrame.current, refetch, refListMessage.current, isLoading]);
+    }, [refFrame.current]);
 
     async function deleteMessage(id: string) {
       const index = curMessage.current.findIndex((e) => e.id === id);
       if (index > -1) {
         curMessage.current = curMessage.current.delete(index);
         setState(curMessage.current);
+      }
+      if (Environment.envType === "web") {
+        rdManager
+          .get<IndexDbInteraction>("IndexDbInteraction")
+          .deleteMessage(id);
       }
       rdManager
         .get<AppRepository>("AppRepository")

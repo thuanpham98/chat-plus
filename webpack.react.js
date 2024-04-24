@@ -16,7 +16,8 @@ module.exports = {
   },
   entry: {
     index: path.resolve(rootPath, "src/index.tsx"),
-    "worker_process_image": path.resolve(rootPath, 'src/infrastructure/processing-image/processing-image-worker.ts')
+    "worker_process_image": path.resolve(rootPath, 'src/infrastructure/processing-image/processing-image-worker.ts'),
+    "worker_interact_indexdb": path.resolve(rootPath, 'src/infrastructure/index-db-interaction/index-db-worker.ts')
   },
   target: "web",
   devtool: "eval-source-map",

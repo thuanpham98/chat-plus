@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+enum MessageType {
+  TEXT = 0;
+  IMAGE = 1;
+  FILE = 2;
+}
+
+message Group {
+    string id = 1;
+    string name=2;
+}
+
+message MessageData {
+    string id = 1;
+    string sender=2;
+    string receiver=3;
+    Group group =4;
+    string createAt=5;
+    string content = 6;
+    MessageType type=7;
+}
+
+message MessageIndexDbInteractionRequest {
+    string eventType= 1;
+    MessageData data = 2;
+    uint64 page = 3;
+    uint64 pageSize =4;
+}
+
+
+message MessageIndexDbInteractionReponseGetListMessages {
+    string eventType=1;
+    repeated MessageData messages=2;
+}
