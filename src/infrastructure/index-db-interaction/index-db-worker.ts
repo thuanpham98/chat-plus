@@ -10,8 +10,6 @@ let isStart = false;
 let portMessage: MessagePort;
 let db: IDBDatabase;
 const dataQuery = new Map<bigint, MessageModel & { timestamp: number }>();
-let shouldReQuery = true;
-let receiver: string;
 
 self.addEventListener("message", async function (event) {
   if (!isStart) {
@@ -87,8 +85,7 @@ async function handlerMessageFromPort(event: MessageEvent) {
         ...message.data,
         timestamp: new Date(message.data.createAt).getTime(),
       }).onsuccess = () => {
-      shouldReQuery = true;
-      dataQuery.clear();
+      console.debug("done save");
     };
   }
 
@@ -101,55 +98,17 @@ async function handlerMessageFromPort(event: MessageEvent) {
   }
 
   if (message.eventType === "list") {
-    if (receiver !== message.data.receiver) {
-      shouldReQuery = true;
-      receiver = message.data.receiver;
-      dataQuery.clear();
-    }
-    if (!shouldReQuery) {
-      const listMessage: Array<MessageData> = [];
-      for (
-        let i = message.page * message.pageSize;
-        i < (message.page + BigInt(1)) * message.pageSize;
-        i++
-      ) {
-        const tmp = dataQuery.get(BigInt(i));
-        tmp &&
-          listMessage.push(
-            MessageData.create({
-              id: tmp.id,
-              content: tmp.content,
-              createAt: tmp.createAt,
-              group: tmp.group
-                ? Group.create({
-                    id: tmp.group.id,
-                    name: tmp.group.name,
-                  })
-                : undefined,
-              receiver: tmp.receiver,
-              sender: tmp.sender,
-              type: tmp.type.valueOf(),
-            }),
-          );
-      }
-      const dataTransfer =
-        MessageIndexDbInteractionReponseGetListMessages.toBinary(
-          MessageIndexDbInteractionReponseGetListMessages.create({
-            eventType: "list",
-            messages: listMessage.reverse(),
-          }),
-        );
-      portMessage.postMessage(dataTransfer, [dataTransfer.buffer]);
-      return;
-    }
     const upperBound = new Date();
     const lowerBound = new Date(upperBound);
     lowerBound.setDate(upperBound.getDate() - 14);
+    lowerBound.setHours(0);
+    lowerBound.setMinutes(0);
+    lowerBound.setSeconds(0);
+    lowerBound.setMilliseconds(0);
     const keyRange = IDBKeyRange.bound(
       lowerBound.getTime(),
       upperBound.getTime(),
     );
-
     db
       .transaction(["message"], "readwrite")
       .objectStore("message")
@@ -168,19 +127,15 @@ async function handlerMessageFromPort(event: MessageEvent) {
         }
         cursor.continue();
       } else {
-        // console.debug(dataQuery);
-        shouldReQuery = false;
         // [dataQuery.entries()].sort(
         //   ([a], [b]) => b[1].timestamp - a[1].timestamp,
         // );
-        // console.debug(dataQuery);
         const listMessage: Array<MessageData> = [];
         for (
           let i = message.page * message.pageSize;
           i < (message.page + BigInt(1)) * message.pageSize;
           i++
         ) {
-          // BigInt(dataQuery.size - 1) -
           const tmp = dataQuery.get(BigInt(i));
           tmp &&
             listMessage.push(
@@ -208,6 +163,7 @@ async function handlerMessageFromPort(event: MessageEvent) {
             }),
           );
         portMessage.postMessage(dataTransfer, [dataTransfer.buffer]);
+        dataQuery.clear();
       }
     };
   }

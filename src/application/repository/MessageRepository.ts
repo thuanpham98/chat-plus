@@ -44,7 +44,7 @@ export class MessageRepository implements IMessageRepository {
           return {
             id: m?.id ?? "",
             content: m?.content ?? "",
-            createAt: m?.createAt ?? "",
+            createAt: m?.create_at ?? "",
             receiver: m?.receiver ?? "",
             sender: m?.sender ?? "",
             type: m?.type ?? 0,
