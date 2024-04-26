@@ -13,7 +13,6 @@ export const MessageItem = ({
   isSender: boolean;
   onDelete: (id: string) => void;
 }) => {
-  console.debug(message.createAt);
   return (
     <div
       className="row"

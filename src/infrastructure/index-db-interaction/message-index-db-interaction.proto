@@ -26,6 +26,7 @@ message MessageIndexDbInteractionRequest {
     MessageData data = 2;
     uint64 page = 3;
     uint64 pageSize =4;
+    string token=5;
 }
 
 

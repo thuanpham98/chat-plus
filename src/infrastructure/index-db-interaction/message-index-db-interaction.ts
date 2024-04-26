@@ -76,6 +76,10 @@ export interface MessageIndexDbInteractionRequest {
    * @generated from protobuf field: uint64 pageSize = 4;
    */
   pageSize: bigint;
+  /**
+   * @generated from protobuf field: string token = 5;
+   */
+  token: string;
 }
 /**
  * @generated from protobuf message MessageIndexDbInteractionReponseGetListMessages
@@ -333,6 +337,7 @@ class MessageIndexDbInteractionRequest$Type extends MessageType$<MessageIndexDbI
         T: 4 /*ScalarType.UINT64*/,
         L: 0 /*LongType.BIGINT*/,
       },
+      { no: 5, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
     ]);
   }
   create(
@@ -342,6 +347,7 @@ class MessageIndexDbInteractionRequest$Type extends MessageType$<MessageIndexDbI
     message.eventType = "";
     message.page = 0n;
     message.pageSize = 0n;
+    message.token = "";
     if (value !== undefined)
       reflectionMergePartial<MessageIndexDbInteractionRequest>(
         this,
@@ -377,6 +383,9 @@ class MessageIndexDbInteractionRequest$Type extends MessageType$<MessageIndexDbI
           break;
         case /* uint64 pageSize */ 4:
           message.pageSize = reader.uint64().toBigInt();
+          break;
+        case /* string token */ 5:
+          message.token = reader.string();
           break;
         default:
           let u = options.readUnknownField;
@@ -418,6 +427,9 @@ class MessageIndexDbInteractionRequest$Type extends MessageType$<MessageIndexDbI
     /* uint64 pageSize = 4; */
     if (message.pageSize !== 0n)
       writer.tag(4, WireType.Varint).uint64(message.pageSize);
+    /* string token = 5; */
+    if (message.token !== "")
+      writer.tag(5, WireType.LengthDelimited).string(message.token);
     let u = options.writeUnknownFields;
     if (u !== false)
       (u == true ? UnknownFieldHandler.onWrite : u)(

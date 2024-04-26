@@ -16,8 +16,9 @@ export class IndexDbInteraction extends RdModule {
   private worker: Worker;
   private channel: MessageChannel;
   private messageSubject: Subject<MessageModel[]>;
+  public isSync: boolean;
 
-  constructor() {
+  constructor(accessToken?: string) {
     super();
     this.key = Symbol("IndexDbInteraction");
     this.messageSubject = new Subject<MessageModel[]>();
@@ -29,10 +30,14 @@ export class IndexDbInteraction extends RdModule {
     this.channel.port1.onmessage = (e) => {
       this.onMessage(e);
     };
-    this.onInit();
+    this.isSync = false;
+    if (accessToken) {
+      this.isSync = true;
+    }
+    this.onInit(accessToken);
   }
 
-  private onInit(): void {
+  private onInit(accessToken?: string): void {
     this.channel.port1.start();
     this.channel.port2.start();
     this.worker.onerror = (e) => {
@@ -42,6 +47,7 @@ export class IndexDbInteraction extends RdModule {
       MessageIndexDbInteractionRequest.create({
         eventType: "init",
         data: {},
+        token: accessToken,
       }),
     );
     this.worker.postMessage(req, [this.channel.port2, req.buffer]);
@@ -51,6 +57,10 @@ export class IndexDbInteraction extends RdModule {
     this.worker.terminate();
     this.channel.port1.close();
     this.channel.port2.close();
+  }
+
+  public isSyncDB(): boolean {
+    return this.isSync;
   }
 
   private onErrorMessage(e) {
@@ -64,6 +74,9 @@ export class IndexDbInteraction extends RdModule {
         MessageIndexDbInteractionReponseGetListMessages.fromBinary(event.data, {
           readUnknownField: "throw",
         });
+      if (message.eventType === "done-sync") {
+        this.isSync = false;
+      }
       if (message.eventType === "list") {
         const listData: MessageModel[] = [];
         for (let i = 0; i < message.messages.length; i++) {

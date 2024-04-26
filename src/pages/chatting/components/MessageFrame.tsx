@@ -79,12 +79,10 @@ const MessageFrame: React.FC<MessageFrameProps> = React.memo(
               (item, index, self) =>
                 index === self.findIndex((t) => t.id === item.id),
             );
-          // console.debug("get-----", paging.current.page);
           if (ret.length < paging.current.pageSize) {
             isLoadedAllData.current = true;
           }
           setState(curMessage.current);
-          // console.debug("return-----", paging.current.page);
           return curMessage.current ?? [];
         }
       },

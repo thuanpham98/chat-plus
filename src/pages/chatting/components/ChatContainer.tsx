@@ -123,7 +123,6 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
         // state.queueFile.map((e) => sendMessageFile(e.file).finally(()=>{
         //   URL.revokeObjectURL(e.data);
         // }));
-        console.debug(state.queueFile);
         // old
         await Promise.all(
           state.queueFile.map((e) =>
@@ -203,9 +202,6 @@ export const ChatContainer: FC<ChatContainerProps> = ({ friend, userId }) => {
       .get<ProcessingImageModule>("ProcessingImageModule")
       .startProcess();
   }
-
-  console.debug("in main", state.queueFile);
-
   return (
     <div
       className="column"

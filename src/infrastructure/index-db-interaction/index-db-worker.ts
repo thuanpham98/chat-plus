@@ -5,6 +5,8 @@ import {
   MessageIndexDbInteractionReponseGetListMessages,
   MessageIndexDbInteractionRequest,
 } from "./message-index-db-interaction";
+import { UserModel } from "@/domain/auth";
+import dayjs from "dayjs";
 
 let isStart = false;
 let portMessage: MessagePort;
@@ -29,23 +31,32 @@ self.addEventListener("message", async function (event) {
 
         indexDbReq.onsuccess = () => {
           db = indexDbReq.result;
-          useDatabase(db);
+          useDatabase(db, message.token);
           console.debug("Database opened successfully");
         };
+
         indexDbReq.onblocked = () => {
           console.debug("Please close all other tabs with this site open!");
         };
+
         indexDbReq.onupgradeneeded = function () {
           db = indexDbReq.result;
-          console.debug("Database needs upgrade or creation");
+
+          if (db.objectStoreNames.contains("message")) {
+            db.deleteObjectStore("message");
+          }
+
           const objectStore = db.createObjectStore("message", {
             keyPath: "id",
           });
+
           objectStore.createIndex("timestamp", "timestamp", {
             unique: false,
           });
-          useDatabase(db);
+
+          useDatabase(db, message.token);
         };
+
         indexDbReq.onerror = (event) => {
           console.error("Error opening database:", event.target);
         };
@@ -58,13 +69,42 @@ self.addEventListener("message", async function (event) {
   }
 });
 
-function useDatabase(database: IDBDatabase) {
+async function useDatabase(database: IDBDatabase, token?: string) {
   database.onversionchange = () => {
     database.close();
     console.error(
       "A new version of this page is ready. Please reload or close this tab!",
     );
   };
+  try {
+    const retFriends = await fetch(
+      "http://localhost:6969/api/v1/user/friends",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: token,
+        },
+      },
+    );
+    const rawFriends = await retFriends.json();
+    let friends: UserModel[] = [];
+    if (rawFriends.data.data && rawFriends.data.data.length > 0) {
+      friends = friends.concat(rawFriends.data.data as UserModel[]);
+    }
+    await Promise.all(friends.map((f) => syncMessageWithsFriends(token, f.id)));
+  } catch (error) {
+    console.error(error);
+  }
+  const dataTransfer = MessageIndexDbInteractionReponseGetListMessages.toBinary(
+    MessageIndexDbInteractionReponseGetListMessages.create({
+      eventType: "done-sync",
+      messages: [],
+    }),
+  );
+
+  portMessage.postMessage(dataTransfer, [dataTransfer.buffer]);
 }
 
 async function handlerMessageFromPort(event: MessageEvent) {
@@ -75,11 +115,14 @@ async function handlerMessageFromPort(event: MessageEvent) {
   const message = MessageIndexDbInteractionRequest.fromBinary(data, {
     readUnknownField: false,
   });
+  if (message.eventType === "reset-db") {
+    if (db.objectStoreNames.contains("message")) {
+      db.transaction(["message"], "readwrite").objectStore("message").clear();
+    }
+  }
   if (message.eventType === "create") {
     db
-      .transaction(["message"], "readwrite", {
-        durability: "strict",
-      })
+      .transaction(["message"], "readwrite")
       .objectStore("message")
       .add({
         ...message.data,
@@ -90,9 +133,7 @@ async function handlerMessageFromPort(event: MessageEvent) {
   }
 
   if (message.eventType === "delete") {
-    db.transaction(["message"], "readwrite", {
-      durability: "strict",
-    })
+    db.transaction(["message"], "readwrite")
       .objectStore("message")
       .delete(message.data.id);
   }
@@ -105,12 +146,17 @@ async function handlerMessageFromPort(event: MessageEvent) {
     lowerBound.setMinutes(0);
     lowerBound.setSeconds(0);
     lowerBound.setMilliseconds(0);
+    upperBound.setHours(23);
+    upperBound.setMinutes(59);
+    upperBound.setSeconds(59);
+    upperBound.setMilliseconds(999);
     const keyRange = IDBKeyRange.bound(
       lowerBound.getTime(),
       upperBound.getTime(),
     );
+
     db
-      .transaction(["message"], "readwrite")
+      .transaction(["message"], "readonly")
       .objectStore("message")
       .index("timestamp")
       .openCursor(keyRange, "prev").onsuccess = (event: any) => {
@@ -166,5 +212,91 @@ async function handlerMessageFromPort(event: MessageEvent) {
         dataQuery.clear();
       }
     };
+  }
+}
+
+async function syncMessageWithsFriends(token: string, friendId: string) {
+  let done = false;
+  let page = 0;
+  const today = new Date();
+
+  const timeZoneConvert = `${today.getTimezoneOffset() > 0 ? "-" : "+"}${-~~(
+    today.getTimezoneOffset() / 600
+  )}${(-today.getTimezoneOffset() / 60) % 10}:00`;
+
+  while (!done) {
+    await new Promise<void>((rev) => {
+      fetch("http://localhost:6969/api/v1/message/list", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: token,
+        },
+        body: JSON.stringify({
+          page: page,
+          page_size: 10,
+          receiver: friendId,
+          to:
+            dayjs(new Date().setHours(23, 59, 59, 999)).format(
+              "YYYY-MM-DDTHH:mm:ss.SSS",
+            ) + `${timeZoneConvert}`,
+          from:
+            dayjs(Date.now() - 1000 * 3600 * 24 * 14).format(
+              "YYYY-MM-DDTHH:mm:ss.SSS",
+            ) + `${timeZoneConvert}`,
+        }),
+      })
+        .then((ret) => {
+          return ret.json();
+        })
+        .then(async (data) => {
+          if (data?.data?.code === 0) {
+            const message: MessageModel[] =
+              data.data?.data?.map((m): MessageModel => {
+                return {
+                  id: m?.id ?? "",
+                  content: m?.content ?? "",
+                  createAt: m?.create_at ?? "",
+                  receiver: m?.receiver ?? "",
+                  sender: m?.sender ?? "",
+                  type: m?.type ?? 0,
+                  group: m?.group
+                    ? {
+                        id: m.group.id,
+                        name: m.group.name,
+                      }
+                    : undefined,
+                };
+              }) ?? [];
+            // update mesage into db --------------------
+            if (message.length > 0) {
+              const tx = db.transaction(["message"], "readwrite");
+              Promise.all(
+                message.map((mes) =>
+                  tx.objectStore("message").put({
+                    ...mes,
+                    timestamp: new Date(mes.createAt).getTime(),
+                  }),
+                ),
+              ).catch((e) => {
+                console.error(e);
+                tx.abort();
+              });
+            }
+            // update mesage into db --------------------
+            if (message.length < 10) {
+              done = true;
+            } else {
+              page++;
+            }
+          } else {
+            done = true;
+          }
+        })
+        .finally(() => {
+          rev();
+        });
+    });
   }
 }

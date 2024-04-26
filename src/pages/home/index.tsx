@@ -3,13 +3,14 @@ import { Outlet } from "react-router-dom";
 import { SideBar } from "./components/SideBar";
 import "./style.css";
 import React, { useEffect } from "react";
-import { RdModulesManager, useRdQuery } from "@radts/reactjs";
+import { RdModulesManager, rdLoading, useRdQuery } from "@radts/reactjs";
 import { AppRepository } from "@/application/services/app-repository";
 import { MessageReponse } from "@/infrastructure/message-protobuf/message";
 import { AppSession } from "@/application/services/app-session";
 import { ProcessingImageModule } from "@/infrastructure/processing-image/processing-image-module";
 import { Environment } from "@/application/services/environment";
 import { IndexDbInteraction } from "@/infrastructure/index-db-interaction/index-db-module";
+import { AppStorage } from "@/application/services/app-storage";
 
 function mergeBuffer(buffer1: Uint8Array, buffer2: Uint8Array): Uint8Array {
   const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
@@ -29,11 +30,28 @@ export const HomeScreen = () => {
       return ret;
     },
   });
+
   useEffect(() => {
     if (data && data.id && isSuccess) {
       const rdModule = new RdModulesManager();
       if (Environment.envType === "web") {
-        rdModule.use(new IndexDbInteraction());
+        console.time("start sync");
+        rdModule.use(
+          new IndexDbInteraction(
+            rdModule.get<AppStorage>("AppStorage").accessToken,
+          ),
+        );
+        rdLoading(true);
+        (async () => {
+          while (
+            rdModule.get<IndexDbInteraction>("IndexDbInteraction").isSyncDB()
+          ) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        })();
+        console.timeEnd("start sync");
+
+        rdLoading(false);
       }
       rdModule.use(new ProcessingImageModule());
 
@@ -99,6 +117,7 @@ export const HomeScreen = () => {
         socket.close();
         if (Environment.envType === "web") {
           rdModule.get<IndexDbInteraction>("IndexDbInteraction").dispose();
+          window.indexedDB.deleteDatabase("my-db");
         }
         rdModule.get<ProcessingImageModule>("ProcessingImageModule").dispose();
       };

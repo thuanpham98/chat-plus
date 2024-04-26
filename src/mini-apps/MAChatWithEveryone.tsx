@@ -6,7 +6,7 @@ const MAChatWithEveryone: FC<{ initPathName: string }> = ({ initPathName }) => {
   const wrapperRef = useRef(null);
   const isFirstRunRef = useRef(true);
   const unmountRef = useRef(() => {
-    console.debug("unmount");
+    console.debug("unmount mini app news");
   });
 
   useEffect(() => {
